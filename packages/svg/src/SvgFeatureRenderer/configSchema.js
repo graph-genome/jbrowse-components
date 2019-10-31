@@ -1,8 +1,20 @@
 import { ConfigurationSchema } from '@gmod/jbrowse-core/configuration'
+import { types } from 'mobx-state-tree'
 
 export default ConfigurationSchema(
   'SvgFeatureRenderer',
   {
+    display: {
+      type: 'stringEnum',
+      model: types.enumeration('Display type', [
+        'squish',
+        'compact',
+        'full',
+        'collapse',
+      ]),
+      description: 'The display style of the features',
+      defaultValue: 'full',
+    },
     color1: {
       type: 'color',
       description: 'the main color of each feature',
