@@ -1113,6 +1113,28 @@
         },
         {
           "type": "BasicTrack",
+          "trackId": "gff3tabix_genes",
+          "name": "GFF3Tabix genes",
+          "category": [
+            "Miscellaneous"
+          ],
+          "adapter": {
+            "type": "Gff3TabixAdapter",
+            "gffGzLocation": {
+              "uri": "test_data/volvox.sort.gff3.gz"
+            },
+            "index": {
+              "location": {
+                "uri": "test_data/volvox.sort.gff3.gz.tbi"
+              }
+            }
+          },
+          "renderer": {
+            "type": "SvgFeatureRenderer"
+          }
+        },
+        {
+          "type": "BasicTrack",
           "trackId": "bigbed_genes",
           "name": "BigBed genes",
           "category": [
