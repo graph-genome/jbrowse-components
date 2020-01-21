@@ -142,6 +142,12 @@ export default types
                 "function(session) { session.addView('SvInspectorView', {})}",
             },
             {
+              name: 'New pangenome view',
+              icon: 'view_comfy',
+              callback:
+                "function(session) { session.addView('PangenomeView', {})}",
+            },
+            {
               name: 'Open tabular data',
               icon: 'view_comfy',
               callback:
@@ -167,6 +173,7 @@ const drawerWidget = session.addDrawerWidget(
     )
     session.showDrawerWidget(drawerWidget)`,
             },
+
           ],
         })
     },
