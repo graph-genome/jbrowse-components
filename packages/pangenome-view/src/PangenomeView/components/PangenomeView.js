@@ -1,3 +1,5 @@
+import App from './prototype/App'
+
 export default pluginManager => {
   const { jbrequire } = pluginManager
   const { getRoot } = jbrequire('mobx-state-tree')
@@ -29,7 +31,7 @@ export default pluginManager => {
       root: {
         position: 'relative',
         marginBottom: theme.spacing(1),
-        overflow: 'hidden',
+        overflow: 'auto',
         background: 'white',
       },
     }
@@ -47,7 +49,7 @@ export default pluginManager => {
         }}
         data-testid={model.id}
       >
-        hello this is our PangenomeView!
+        <App />
       </div>
     )
   }

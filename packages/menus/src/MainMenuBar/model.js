@@ -173,7 +173,6 @@ const drawerWidget = session.addDrawerWidget(
     )
     session.showDrawerWidget(drawerWidget)`,
             },
-
           ],
         })
     },

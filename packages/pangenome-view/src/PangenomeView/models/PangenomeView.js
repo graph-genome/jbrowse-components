@@ -1,10 +1,22 @@
 export default pluginManager => {
-  const {jbrequire} = pluginManager
-  const {transaction} = jbrequire('mobx')
-  const {types, getParent, getRoot} = jbrequire('mobx-state-tree')
-  const {ElementId, Region} = jbrequire('@gmod/jbrowse-core/mst-types')
+  const { jbrequire } = pluginManager
+  const { transaction } = jbrequire('mobx')
+  const { types, getParent, getRoot } = jbrequire('mobx-state-tree')
+  const { ElementId, Region } = jbrequire('@gmod/jbrowse-core/mst-types')
   const { readConfObject } = jbrequire('@gmod/jbrowse-core/configuration')
-  const { clamp , getSession} = jbrequire('@gmod/jbrowse-core/util')
+  const { clamp, getSession } = jbrequire('@gmod/jbrowse-core/util')
+
+  fetch(
+    'http://localhost:3001/test_data/sebastian.Athaliana.all.50000.w100000.schematic.json',
+  ) // Call the fetch function passing the url of the API as a parameter
+    .then(resp => resp.json())
+    .then(function(data) {
+      // Your code for handling the data you get from the API
+      console.log(data)
+    })
+    .catch(function() {
+      // This is where you run code if the server returns any errors
+    })
 
   const minHeight = 100
   const minWidth = 100
