@@ -34,7 +34,34 @@ export default pluginManager => {
         overflow: 'auto',
         background: 'white',
       },
+      controls: {
+        overflow: 'hidden',
+        whiteSpace: 'nowrap',
+        background: grey[200],
+        boxSizing: 'border-box',
+        borderRight: '1px solid #a2a2a2',
+        borderBottom: '1px solid #a2a2a2',
+      },
     }
+  })
+
+  const Controls = observer(({ model }) => {
+    const classes = useStyles()
+    return (
+      <div className={classes.controls}>
+        {model.hideCloseButton ? null : (
+          <IconButton
+            onClick={model.closeView}
+            className={classes.iconButton}
+            title="close this view"
+            data-testid="pangenome_close_view"
+            color="secondary"
+          >
+            <Icon fontSize="small">close</Icon>
+          </IconButton>
+        )}
+      </div>
+    )
   })
 
   function PangenomeView({ model }) {
@@ -49,7 +76,8 @@ export default pluginManager => {
         }}
         data-testid={model.id}
       >
-        <App />
+        <Controls model={model} />
+        <App model={model} />
       </div>
     )
   }

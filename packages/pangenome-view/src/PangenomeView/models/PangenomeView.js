@@ -25,6 +25,8 @@ export default pluginManager => {
     .model('PangenomeView', {
       id: ElementId,
       type: types.literal('PangenomeView'),
+      beginBin: 10,
+      endBin: 250,
 
       width: 800,
       height: types.optional(
@@ -60,6 +62,9 @@ export default pluginManager => {
       },
       setError(error) {
         self.error = error
+      },
+      closeView() {
+        getParent(self, 2).removeView(self)
       },
     }))
 

@@ -5,90 +5,66 @@ import { values, configure } from "mobx";
 
 configure({enforceActions: "observed"});
 
-const randomId = () => Math.floor(Math.random() * 1000).toString(36);
-
 const Todo = types
     .model({
-        name: types.optional(types.string, ""),
-        done: types.optional(types.boolean, false)
+        value: 1,
+        label: types.optional(types.string, ""),
     })
     .actions(self => {
-        function setName(newName) {
-            self.name = newName;
+        function setValue(newVal) {
+            self.value = newVal /1;
         }
 
-        function toggle() {
-            self.done = !self.done;
-        }
-
-        return { setName, toggle };
+        return { setValue };
     });
-
-const User = types.model({
-    name: types.optional(types.string, "")
-});
 
 const RootStore = types
     .model({
-        users: types.map(User),
         todos: types.map(Todo)
     })
     .views(self => ({
-        get pendingCount() {
-            return values(self.todos).filter(todo => !todo.done).length;
-        },
-        get completedCount() {
-            return values(self.todos).filter(todo => todo.done).length;
-        }
-    }))
-    .actions(self => {
-        function addTodo(id, name) {
-            self.todos.set(id, Todo.create({ name }));
-        }
-
-        return { addTodo };
-    });
+    }));
 
 export const store = RootStore.create({
     users: {},
     todos: {
         "1": {
-            name: "Eat a cake",
-            done: true
+            value: 2500,
+            label: "Begin Bin: "
+        },
+        "2": {
+            value: 2700,
+            label: "End Bin: "
         }
     }
 });
 
 const TodoView = observer(props => (
     <div>
+        {props.todo.label}
         <input
-            type="checkbox"
-            checked={props.todo.done}
-            onChange={e => props.todo.toggle()}
+            type="number"
+            value={props.todo.value}
+            onChange={e => props.todo.setValue(e.target.value)}
+            aria-label={"Bin Index: "}
         />
-        <input
-            type="text"
-            value={props.todo.name}
-            onChange={e => props.todo.setName(e.target.value)}
-        />
-    </div>
-));
-
-const TodoCounterView = observer(props => (
-    <div>
-        {props.store.pendingCount} pending, {props.store.completedCount} completed
     </div>
 ));
 
 export const AppView = observer(props => (
     <div>
-        <button onClick={e => props.store.addTodo(randomId(), "New Task")}>
-            Add Task
-        </button>
-        {values(props.store.todos).map(todo => (
-            <TodoView todo={todo} />
-        ))}
-        <TodoCounterView store={props.store} />
+      <input
+        type="number"
+        value={model.beginBin}
+        onChange={e => model.setBeginBin(e.target.value)}
+        aria-label={"Bin Index: "}
+      />
+      <input
+        type="number"
+        value={props.todo.value}
+        onChange={e => props.todo.setValue(e.target.value)}
+        aria-label={"Bin Index: "}
+      />
     </div>
 ));
 
