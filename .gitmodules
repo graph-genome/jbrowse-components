@@ -1,0 +1,3 @@
+[submodule "/home/heumos/git/jbrowse-components/packages/pangenome-view/src/PangenomeView/components/prototype"]
+	path = /home/heumos/git/jbrowse-components/packages/pangenome-view/src/PangenomeView/components/prototype
+	url = git@github.com:graph-genome/Schematize.git

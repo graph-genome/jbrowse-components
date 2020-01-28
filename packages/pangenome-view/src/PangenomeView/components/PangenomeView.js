@@ -1,4 +1,4 @@
-import App from './prototype/App'
+import App from './prototype/src/App'
 
 export default pluginManager => {
   const { jbrequire } = pluginManager

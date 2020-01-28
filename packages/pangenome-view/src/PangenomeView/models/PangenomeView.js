@@ -6,18 +6,6 @@ export default pluginManager => {
   const { readConfObject } = jbrequire('@gmod/jbrowse-core/configuration')
   const { clamp, getSession } = jbrequire('@gmod/jbrowse-core/util')
 
-  fetch(
-    'http://localhost:3001/test_data/sebastian.Athaliana.all.50000.w100000.schematic.json',
-  ) // Call the fetch function passing the url of the API as a parameter
-    .then(resp => resp.json())
-    .then(function(data) {
-      // Your code for handling the data you get from the API
-      console.log(data)
-    })
-    .catch(function() {
-      // This is where you run code if the server returns any errors
-    })
-
   const minHeight = 100
   const minWidth = 100
   const defaultHeight = 400
