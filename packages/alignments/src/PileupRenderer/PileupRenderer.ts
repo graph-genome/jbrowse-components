@@ -139,7 +139,7 @@ export default class extends BoxRendererType {
       }
       const { feature, startPx, endPx, topPx, heightPx } = feat
       ctx.fillStyle = readConfObject(config, 'alignmentColor', [feature])
-      ctx.fillRect(startPx, topPx, endPx - startPx, heightPx)
+      ctx.fillRect(startPx, topPx, Math.max(endPx - startPx, 1.5), heightPx)
       const mismatches: Mismatch[] =
         bpPerPx < 10 ? feature.get('mismatches') : feature.get('skips_and_dels')
       if (mismatches) {
@@ -168,7 +168,7 @@ export default class extends BoxRendererType {
               ] || '#888'
             ctx.fillRect(mismatchStartPx, topPx, widthPx, heightPx)
 
-            if (widthPx >= charSize.width && heightPx >= charSize.height - 2) {
+            if (widthPx >= charSize.width && heightPx >= charSize.height - 5) {
               ctx.fillStyle = mismatch.type === 'deletion' ? 'white' : 'black'
               ctx.fillText(
                 mismatch.base,
