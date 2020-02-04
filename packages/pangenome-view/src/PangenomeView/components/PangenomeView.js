@@ -1,4 +1,5 @@
 import App from './prototype/src/App'
+import { store } from './prototype/src/ViewportInputsStore'
 
 export default pluginManager => {
   const { jbrequire } = pluginManager
@@ -77,7 +78,7 @@ export default pluginManager => {
         data-testid={model.id}
       >
         <Controls model={model} />
-        <App model={model} />
+        <App model={model} store={store} />
       </div>
     )
   }
