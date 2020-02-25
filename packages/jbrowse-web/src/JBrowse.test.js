@@ -275,6 +275,7 @@ describe('test renamed refs', () => {
       waitForElement(() => getAllByText('ctgA_110_638_0:0:0_3:0:0_15b')),
     ).resolves.toBeTruthy()
   })
+
   it('open a bigwig with a renamed reference', async () => {
     const state = JBrowseRootModel.create({ jbrowse: config })
     const { getByTestId: byId, getAllByTestId, getByText } = render(
@@ -448,7 +449,7 @@ describe('circular views', () => {
     // wait for the UI to be loaded
     await waitForElement(() => getByText('Help'))
 
-    // open a new circular view on the same dataset as the test linear view
+    // open a new circular view on the same assembly as the test linear view
     state.session.addViewFromAnotherView('CircularView', state.session.views[0])
 
     // open a track selector for the circular view
@@ -479,10 +480,15 @@ describe('breakpoint split view', () => {
   it('open a split view', async () => {
     const spy = jest.spyOn(console, 'warn').mockImplementation(() => {})
     const state = JBrowseRootModel.create({ jbrowse: breakpointConfig })
-    const { findByTestId } = render(<JBrowse initialState={state} />)
-
+    const { findByTestId, queryAllByTestId } = render(
+      <JBrowse initialState={state} />,
+    )
+    await wait(() => {
+      const r = queryAllByTestId('r1')
+      expect(r.length).toBe(2)
+    }) // the breakpoint could be partially loaded so explicitly wait for two items
     expect(
-      await findByTestId('pacbio_hg002_breakpoints-loaded', { timeout: 8000 }),
+      await findByTestId('pacbio_hg002_breakpoints-loaded'),
     ).toMatchSnapshot()
 
     expect(await findByTestId('pacbio_vcf-loaded')).toMatchSnapshot()
@@ -508,4 +514,76 @@ test('404 sequence file', async () => {
   await findByText(/HTTP 404/)
   expect(spy).toHaveBeenCalled()
   spy.mockRestore()
+})
+
+describe('snpcoverage adapter tests', () => {
+  it('test that SNPCoverage with CRAM displays (uses contigA instead of ctgA)', async () => {
+    const state = JBrowseRootModel.create({ jbrowse: config })
+    const { getByTestId: byId, getAllByTestId, getByText } = render(
+      <JBrowse initialState={state} />,
+    )
+    await waitForElement(() => getByText('Help'))
+    state.session.views[0].setNewView(5, 100)
+    fireEvent.click(
+      await waitForElement(() => byId('htsTrackEntry-volvox_cram_SNP')),
+    )
+    const canvas = await waitForElement(() =>
+      getAllByTestId('prerendered_canvas'),
+    )
+
+    const img = canvas[0].toDataURL()
+    const data = img.replace(/^data:image\/\w+;base64,/, '')
+    const buf = Buffer.from(data, 'base64')
+    // this is needed to do a fuzzy image comparison because
+    // the travis-ci was 2 pixels different for some reason, see PR #710
+    expect(buf).toMatchImageSnapshot({
+      failureThreshold: 0.5,
+      failureThresholdType: 'percent',
+    })
+  })
+  it('test that SNPCoverage with BAM displays (uses contigA instead of ctgA)', async () => {
+    const state = JBrowseRootModel.create({ jbrowse: config })
+    const { getByTestId: byId, getAllByTestId, getByText } = render(
+      <JBrowse initialState={state} />,
+    )
+    await waitForElement(() => getByText('Help'))
+    state.session.views[0].setNewView(5, 100)
+    fireEvent.click(
+      await waitForElement(() => byId('htsTrackEntry-volvox_bam_altname_SNP')),
+    )
+    const canvas = await waitForElement(() =>
+      getAllByTestId('prerendered_canvas'),
+    )
+
+    const img = canvas[0].toDataURL()
+    const data = img.replace(/^data:image\/\w+;base64,/, '')
+    const buf = Buffer.from(data, 'base64')
+    // this is needed to do a fuzzy image comparison because
+    // the travis-ci was 2 pixels different for some reason, see PR #710
+    expect(buf).toMatchImageSnapshot({
+      failureThreshold: 0.5,
+      failureThresholdType: 'percent',
+    })
+  })
+  it('SNPCoverage test that BAI with 404 file displays error', async () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    const state = JBrowseRootModel.create({ jbrowse: config })
+    const { getByTestId: byId, getAllByText } = render(
+      <JBrowse initialState={state} />,
+    )
+    fireEvent.click(
+      await waitForElement(() =>
+        byId('htsTrackEntry-volvox_alignments_bai_nonexist_SNP'),
+      ),
+    )
+    await expect(
+      waitForElement(() =>
+        getAllByText(
+          'HTTP 404 fetching test_data/volvox-sorted.bam.bai.nonexist',
+        ),
+      ),
+    ).resolves.toBeTruthy()
+    expect(spy).toHaveBeenCalled()
+    spy.mockRestore()
+  })
 })

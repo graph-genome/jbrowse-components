@@ -1,22 +1,25 @@
 import jsonStableStringify from 'json-stable-stringify'
 import { observable, toJS } from 'mobx'
+import { getSnapshot } from 'mobx-state-tree'
 import { readConfObject } from './configuration'
 
 export default self => ({
   views: {
     get assemblyData() {
       const assemblyData = observable.map({})
-      for (const datasetConfig of self.datasets) {
-        const assemblyConfig = datasetConfig.assembly
+      for (const assemblyConfig of self.assemblies) {
         const assemblyName = readConfObject(assemblyConfig, 'name')
         const assemblyInfo = {}
-        if (assemblyConfig.sequence)
+        if (assemblyConfig.sequence) {
           assemblyInfo.sequence = assemblyConfig.sequence
+        }
         const refNameAliasesConf = readConfObject(
           assemblyConfig,
           'refNameAliases',
         )
-        if (refNameAliasesConf) assemblyInfo.refNameAliases = refNameAliasesConf
+        if (refNameAliasesConf) {
+          assemblyInfo.refNameAliases = refNameAliasesConf
+        }
         const aliases = readConfObject(assemblyConfig, 'aliases')
         assemblyInfo.aliases = aliases
         assemblyData.set(assemblyName, assemblyInfo)
@@ -59,7 +62,7 @@ export default self => ({
     async getRefNameAliases(assemblyName, opts = {}) {
       const refNameAliases = {}
       const assemblyConfig = self.assemblyData.get(assemblyName)
-      if (assemblyConfig.refNameAliases) {
+      if (assemblyConfig && assemblyConfig.refNameAliases) {
         const adapterConfigId = jsonStableStringify(
           toJS(assemblyConfig.refNameAliases.adapter),
         )
@@ -86,6 +89,11 @@ export default self => ({
      * uses those to build a Map of adapter_ref_name -> canonical_ref_name
      */
     async addRefNameMapForAdapter(adapterConf, assemblyName, opts = {}) {
+      const assemblyConfig = self.assemblyData.get(assemblyName)
+      let sequenceConfig = {}
+      if (assemblyConfig && assemblyConfig.sequence) {
+        sequenceConfig = getSnapshot(assemblyConfig.sequence.adapter)
+      }
       const refNameAliases = await self.getRefNameAliases(assemblyName, opts)
       const adapterConfigId = jsonStableStringify(adapterConf)
       const refNameMap = observable.map({})
@@ -97,6 +105,8 @@ export default self => ({
           sessionId: assemblyName,
           adapterType: readConfObject(adapterConf, 'type'),
           adapterConfig: adapterConf,
+          sequenceAdapterType: sequenceConfig.type,
+          sequenceAdapterConfig: sequenceConfig,
           signal: opts.signal,
         },
         { timeout: 1000000 },

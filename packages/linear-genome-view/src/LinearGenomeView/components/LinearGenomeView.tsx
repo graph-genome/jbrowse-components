@@ -367,22 +367,14 @@ const RefSeqDropdown = observer(({ model, onSubmit }) => {
 
 const Header = observer(({ model }: { model: LGV }) => {
   const classes = useStyles()
-  const [error, setError] = useState<string | undefined>()
-  const navTo = (locstring: string) => {
-    if (!model.navToLocstring(locstring)) {
-      setError(`Unable to navigate to ${locstring}`)
-    } else {
-      setError(undefined)
-    }
-  }
   return (
     <div className={classes.headerBar}>
       {model.hideControls ? null : <Controls model={model} />}
       <TextFieldOrTypography model={model} />
       <div className={classes.spacer} />
 
-      <Search onSubmit={navTo} error={error} />
-      <RefSeqDropdown onSubmit={navTo} model={model} />
+      <Search onSubmit={model.navToLocstring} error={''} />
+      <RefSeqDropdown onSubmit={model.navToLocstring} model={model} />
 
       <ZoomControls model={model} />
       <div className={classes.spacer} />
@@ -421,24 +413,21 @@ const Controls = observer(({ model }) => {
 // not extracted to a separate component just yet...
 const ImportForm = observer(({ model }) => {
   const classes = useStyles()
-  const [selectedDatasetIdx, setSelectedDatasetIdx] = useState('')
-  const { datasets } = getRoot(model).jbrowse
+  const [selectedAssemblyIdx, setSelectedAssemblyIdx] = useState('')
+  const { assemblies } = getRoot(model).jbrowse
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const datasetChoices = datasets.map((dataset: any) =>
-    readConfObject(dataset, 'name'),
+  const assemblyChoices = assemblies.map((assembly: any) =>
+    readConfObject(assembly, 'name'),
   )
   function openButton() {
-    if (parseInt(selectedDatasetIdx, 10) >= 0) {
-      const dataset = datasets[Number(selectedDatasetIdx)]
-      if (dataset) {
-        const assemblyName = readConfObject(dataset.assembly, 'name')
-        if (
-          assemblyName &&
-          assemblyName !== model.displayRegionsFromAssemblyName
-        ) {
-          model.setDisplayedRegionsFromAssemblyName(assemblyName)
-          return
-        }
+    if (parseInt(selectedAssemblyIdx, 10) >= 0) {
+      const assemblyName = assemblyChoices[Number(selectedAssemblyIdx)]
+      if (
+        assemblyName &&
+        assemblyName !== model.displayRegionsFromAssemblyName
+      ) {
+        model.setDisplayedRegionsFromAssemblyName(assemblyName)
+        return
       }
     }
     model.setDisplayedRegions([])
@@ -469,15 +458,15 @@ const ImportForm = observer(({ model }) => {
         >
           <Grid item>
             <FormControl component="fieldset">
-              <FormLabel component="legend">Select dataset to view</FormLabel>
+              <FormLabel component="legend">Select assembly to view</FormLabel>
               <FormGroup>
                 <Select
-                  value={selectedDatasetIdx}
+                  value={selectedAssemblyIdx}
                   onChange={event => {
-                    setSelectedDatasetIdx(String(event.target.value))
+                    setSelectedAssemblyIdx(String(event.target.value))
                   }}
                 >
-                  {datasetChoices.map((name: string, idx: number) => (
+                  {assemblyChoices.map((name: string, idx: number) => (
                     <MenuItem key={name} value={idx}>
                       {name}
                     </MenuItem>
@@ -488,7 +477,7 @@ const ImportForm = observer(({ model }) => {
           </Grid>
           <Grid item>
             <Button
-              disabled={selectedDatasetIdx === undefined}
+              disabled={selectedAssemblyIdx === undefined}
               onClick={openButton}
               variant="contained"
               color="primary"
@@ -549,7 +538,7 @@ const LinearGenomeView = observer((props: { model: LGV }) => {
               <div
                 style={{ gridRow: 'error', textAlign: 'center', color: 'red' }}
               >
-                {error.message}
+                {`${error}`}
               </div>
             ) : (
               <>
